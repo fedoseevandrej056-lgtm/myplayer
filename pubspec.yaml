@@ -12,8 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   
-  # Core Audio (compatible with Flutter 3.19.0+)
+  # Core Audio (compatible with V2 embedding)
   just_audio: ^0.9.40
+  audio_session: ^0.1.25
   
   # State Management (compatible version)
   flutter_riverpod: ^2.4.9
@@ -22,7 +23,6 @@ dependencies:
   cupertino_icons: ^1.0.6
   
   # Device Features (compatible versions)
-  sensors_plus: ^3.0.2
   haptic_feedback: ^0.4.0
 
 dev_dependencies:
