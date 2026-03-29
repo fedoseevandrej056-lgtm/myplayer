@@ -9,9 +9,6 @@ import 'services/audio_service.dart';
 import 'services/youtube_search_service.dart';
 import 'widgets/liquid_aura.dart';
 import 'widgets/morphing_play_button.dart';
-import 'widgets/elastic_scrubber.dart';
-import 'widgets/breathing_artwork.dart';
-import 'widgets/particle_shift_transition.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -144,7 +141,7 @@ class _MainScreenState extends ConsumerState<MainScreen>
             : null,
         // Mini player for home and search screens
         bottomSheet: _currentIndex != 2
-            ? _buildMiniPlayer(isPlaying, position.value, duration.value)
+            ? _buildMiniPlayer(isPlaying, position.value ?? Duration.zero, duration.value ?? Duration.zero)
             : null,
       ),
     );

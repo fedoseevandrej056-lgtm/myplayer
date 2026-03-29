@@ -66,7 +66,7 @@ class _BreathingArtworkState extends State<BreathingArtwork>
   }
 
   void _startListening() {
-    accelerometerEvents.listen((AccelerometerEvent event) {
+    accelerometerEventStream().listen((AccelerometerEvent event) {
       if (mounted) {
         setState(() {
           // Normalize and clamp the tilt values
@@ -126,13 +126,6 @@ class _BreathingArtworkState extends State<BreathingArtwork>
             (_breathingAnimation.value * 0.05) * 
             (bpm / 80.0); // Scale breathing effect with BPM
         
-        // Calculate parallax offset
-        final parallaxOffset = Offset.lerp(
-          Offset.zero,
-          Offset(_tiltX * 20, _tiltY * 20),
-          _parallaxAnimation.value,
-        )!;
-        
         return Transform(
           transform: Matrix4.identity()
             ..setEntry(3, 2, 0.001) // Perspective
@@ -167,39 +160,36 @@ class _BreathingArtworkState extends State<BreathingArtwork>
                   // Main artwork
                   if (widget.imageUrl != null)
                     Positioned.fill(
-                      child: Transform.translate(
-                        offset: parallaxOffset,
-                        child: CachedNetworkImage(
-                          imageUrl: widget.imageUrl!,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Colors.purple.shade900,
-                                  Colors.blue.shade900,
-                                ],
-                              ),
+                      child: CachedNetworkImage(
+                        imageUrl: widget.imageUrl!,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.purple.shade900,
+                                Colors.blue.shade900,
+                              ],
                             ),
                           ),
-                          errorWidget: (context, url, error) => Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Colors.grey.shade800,
-                                  Colors.grey.shade900,
-                                ],
-                              ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.grey.shade800,
+                                Colors.grey.shade900,
+                              ],
                             ),
-                            child: const Icon(
-                              Icons.music_note,
-                              size: 80,
-                              color: Colors.white54,
-                            ),
+                          ),
+                          child: const Icon(
+                            Icons.music_note,
+                            size: 80,
+                            color: Colors.white54,
                           ),
                         ),
                       ),
@@ -242,7 +232,6 @@ class _BreathingArtworkState extends State<BreathingArtwork>
                         ),
                       ),
                     ),
-                  ),
                   
                   // Progress ring around artwork
                   if (widget.duration != null && widget.position != null)

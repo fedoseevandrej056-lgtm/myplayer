@@ -3,16 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:ui' as ui;
 import '../widgets/liquid_aura.dart';
 import '../widgets/morphing_play_button.dart';
-import '../services/audio_service.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerState = ref.watch(playerStateProvider);
-    final isPlaying = playerState.value?.playing ?? false;
-    
     return LiquidAura(
       child: CustomScrollView(
         slivers: [
@@ -32,23 +28,6 @@ class HomeScreen extends ConsumerWidget {
               ),
               centerTitle: false,
               titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-            ),
-            background: ClipRRect(
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.white.withOpacity(0.1),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
             ),
           ),
           

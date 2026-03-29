@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:ui' as ui;
 import '../widgets/liquid_aura.dart';
 import '../widgets/breathing_artwork.dart';
 import '../widgets/morphing_play_button.dart';
 import '../widgets/elastic_scrubber.dart';
-import '../widgets/particle_shift_transition.dart';
 import '../services/audio_service.dart';
 
 class NowPlayingScreen extends ConsumerStatefulWidget {

@@ -77,7 +77,7 @@ class _ElasticScrubberState extends State<ElasticScrubber>
     
     setState(() {
       _dragValue = newValue;
-      _elasticity = 1.2 + (details.primaryDelta!?.abs() ?? 0.0) * 0.01;
+      _elasticity = 1.2 + (details.primaryDelta?.abs() ?? 0.0) * 0.01;
     });
 
     final newPosition = Duration(

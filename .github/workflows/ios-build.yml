@@ -9,11 +9,11 @@ on:
 
 env:
   FLUTTER_VERSION: '3.19.0'
-  XCODE_VERSION: '15.2'
+  XCODE_VERSION: '15.1'
 
 jobs:
   build-ios:
-    runs-on: macos-latest
+    runs-on: macos-14
     
     steps:
     - name: Checkout repository
