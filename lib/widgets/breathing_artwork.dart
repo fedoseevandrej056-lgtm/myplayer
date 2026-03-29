@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class BreathingArtwork extends StatefulWidget {
   final String? imageUrl;
@@ -153,37 +152,21 @@ class _BreathingArtworkState extends State<BreathingArtwork>
                   // Main artwork
                   if (widget.imageUrl != null)
                     Positioned.fill(
-                      child: CachedNetworkImage(
-                        imageUrl: widget.imageUrl!,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.purple.shade900,
-                                Colors.blue.shade900,
-                              ],
-                            ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.purple.shade900,
+                              Colors.blue.shade900,
+                            ],
                           ),
                         ),
-                        errorWidget: (context, url, error) => Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.grey.shade800,
-                                Colors.grey.shade900,
-                              ],
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.music_note,
-                            size: 80,
-                            color: Colors.white54,
-                          ),
+                        child: const Icon(
+                          Icons.music_note,
+                          color: Colors.white54,
+                          size: 80,
                         ),
                       ),
                     )
