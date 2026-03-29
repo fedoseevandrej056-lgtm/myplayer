@@ -11,13 +11,13 @@ class BreathingArtwork extends StatefulWidget {
   final Duration? position;
 
   const BreathingArtwork({
-    Key? key,
+    super.key,
     this.imageUrl,
     this.size = 300.0,
     this.isPlaying = false,
     this.duration,
     this.position,
-  }) : super(key: key);
+  });
 
   @override
   State<BreathingArtwork> createState() => _BreathingArtworkState();
@@ -69,12 +69,10 @@ class _BreathingArtworkState extends State<BreathingArtwork>
     accelerometerEventStream().listen((AccelerometerEvent event) {
       if (mounted) {
         setState(() {
-          // Normalize and clamp the tilt values
           _tiltX = (event.x / 9.81).clamp(-1.0, 1.0) * _maxTilt;
           _tiltY = (event.y / 9.81).clamp(-1.0, 1.0) * _maxTilt;
         });
         
-        // Update parallax animation
         _parallaxController.reset();
         _parallaxController.forward();
       }
@@ -107,12 +105,10 @@ class _BreathingArtworkState extends State<BreathingArtwork>
   }
 
   double _getBPM() {
-    // Simulate BPM based on track duration or default to 60
     if (widget.duration != null) {
-      // Estimate BPM from track characteristics
       return 60.0 + (widget.duration!.inSeconds % 60);
     }
-    return 80.0; // Default relaxed BPM
+    return 80.0;
   }
 
   @override
@@ -120,18 +116,17 @@ class _BreathingArtworkState extends State<BreathingArtwork>
     return AnimatedBuilder(
       animation: Listenable.merge([_breathingAnimation, _parallaxAnimation]),
       builder: (context, child) {
-        // Calculate breathing scale based on BPM
         final bpm = _getBPM();
         final breathingScale = 1.0 + 
             (_breathingAnimation.value * 0.05) * 
-            (bpm / 80.0); // Scale breathing effect with BPM
+            (bpm / 80.0);
         
         return Transform(
           transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.001) // Perspective
-            ..rotateY(_tiltX * 0.3) // 3D tilt on X-axis
-            ..rotateX(-_tiltY * 0.3) // 3D tilt on Y-axis
-            ..scale(breathingScale), // Breathing effect
+            ..setEntry(3, 2, 0.001)
+            ..rotateY(_tiltX * 0.3)
+            ..rotateX(-_tiltY * 0.3)
+            ..scale(breathingScale),
           alignment: Alignment.center,
           child: Container(
             width: widget.size,
@@ -139,13 +134,11 @@ class _BreathingArtworkState extends State<BreathingArtwork>
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20.0),
               boxShadow: [
-                // Dynamic shadow based on tilt
                 BoxShadow(
                   color: Colors.black.withOpacity(0.4),
                   blurRadius: 30.0,
                   offset: Offset(_tiltX * 15, _tiltY * 15 + 10),
                 ),
-                // Inner glow
                 BoxShadow(
                   color: Colors.white.withOpacity(0.1),
                   blurRadius: 20.0,
@@ -195,7 +188,6 @@ class _BreathingArtworkState extends State<BreathingArtwork>
                       ),
                     )
                   else
-                    // Default artwork
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -232,14 +224,14 @@ class _BreathingArtworkState extends State<BreathingArtwork>
                         ),
                       ),
                     ),
+                  ),
                   
                   // Progress ring around artwork
                   if (widget.duration != null && widget.position != null)
                     Positioned.fill(
                       child: CustomPaint(
                         painter: ProgressRingPainter(
-                          progress: widget.position!.inMilliseconds / 
-                                   widget.duration!.inMilliseconds,
+                          progress: widget.position!.inMilliseconds / widget.duration!.inMilliseconds,
                           color: Colors.white.withOpacity(0.8),
                           strokeWidth: 3.0,
                         ),
@@ -271,7 +263,6 @@ class ProgressRingPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = math.min(size.width, size.height) / 2 - strokeWidth;
     
-    // Background ring
     final bgPaint = Paint()
       ..color = color.withOpacity(0.2)
       ..style = PaintingStyle.stroke
@@ -280,7 +271,6 @@ class ProgressRingPainter extends CustomPainter {
     
     canvas.drawCircle(center, radius, bgPaint);
     
-    // Progress ring
     final progressPaint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
@@ -291,13 +281,12 @@ class ProgressRingPainter extends CustomPainter {
     final sweepAngle = 2 * math.pi * progress;
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2, // Start from top
+      -math.pi / 2,
       sweepAngle,
       false,
       progressPaint,
     );
     
-    // Progress dot
     if (progress > 0.0) {
       final dotAngle = -math.pi / 2 + sweepAngle;
       final dotX = center.dx + radius * math.cos(dotAngle);
