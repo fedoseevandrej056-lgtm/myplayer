@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 
 class BreathingArtwork extends StatefulWidget {
   final String? imageUrl;
@@ -65,11 +64,12 @@ class _BreathingArtworkState extends State<BreathingArtwork>
   }
 
   void _startListening() {
-    accelerometerEventStream().listen((AccelerometerEvent event) {
+    // Simulated sensor data for demo purposes
+    Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) {
         setState(() {
-          _tiltX = (event.x / 9.81).clamp(-1.0, 1.0) * _maxTilt;
-          _tiltY = (event.y / 9.81).clamp(-1.0, 1.0) * _maxTilt;
+          _tiltX = (math.Random().nextDouble() - 0.5) * _maxTilt;
+          _tiltY = (math.Random().nextDouble() - 0.5) * _maxTilt;
         });
         
         _parallaxController.reset();
