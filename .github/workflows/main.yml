@@ -1,4 +1,4 @@
-name: Build and Deploy iOS & Android (FINAL FIX)
+name: Build and Deploy iOS & Android (SIMPLE FIX)
 
 on:
   push:
@@ -31,17 +31,15 @@ jobs:
       with:
         xcode-version: '15.1'
         
-    - name: FIX iOS Platform Files
+    - name: Create iOS structure
       run: |
-        # Remove broken ios folder
         rm -rf ios
-        # Recreate with proper structure
         flutter create . --platforms=ios --org com.fedoseevmusic
         
     - name: Get Flutter dependencies
       run: flutter pub get
       
-    - name: Install CocoaPods (FIXED)
+    - name: Install CocoaPods
       run: |
         cd ios
         rm -rf Pods
@@ -49,10 +47,10 @@ jobs:
         pod install --repo-update
         cd ..
         
-    - name: Build iOS app (unsigned)
+    - name: Build iOS app
       run: flutter build ios --release --no-codesign
         
-    - name: Package unsigned IPA
+    - name: Package IPA
       run: |
         mkdir -p Payload
         cp -r build/ios/iphoneos/Runner.app Payload/
@@ -85,11 +83,9 @@ jobs:
         channel: 'stable'
         cache: true
         
-    - name: FIX Android Platform Files
+    - name: Create Android structure
       run: |
-        # Remove broken android folder
         rm -rf android
-        # Recreate with proper structure
         flutter create . --platforms=android --org com.fedoseevmusic
         
     - name: Get Flutter dependencies
@@ -98,7 +94,7 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x android/gradlew
         
-    - name: Build APK (FIXED)
+    - name: Build APK
       run: flutter build apk --release
       
     - name: Upload APK artifact
