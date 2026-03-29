@@ -1,4 +1,4 @@
-name: Build and Deploy iOS & Android (V2 Embedding)
+name: Build and Deploy iOS & Android (FINAL FIX)
 
 on:
   push:
@@ -31,13 +31,17 @@ jobs:
       with:
         xcode-version: '15.1'
         
-    - name: Ensure modern platform files (V2 embedding)
-      run: flutter create . --platforms=ios,android --org com.fedoseevmusic
+    - name: FIX iOS Platform Files
+      run: |
+        # Remove broken ios folder
+        rm -rf ios
+        # Recreate with proper structure
+        flutter create . --platforms=ios --org com.fedoseevmusic
         
     - name: Get Flutter dependencies
       run: flutter pub get
       
-    - name: Install CocoaPods (clean install)
+    - name: Install CocoaPods (FIXED)
       run: |
         cd ios
         rm -rf Pods
@@ -81,8 +85,12 @@ jobs:
         channel: 'stable'
         cache: true
         
-    - name: Ensure modern platform files (V2 embedding)
-      run: flutter create . --platforms=ios,android --org com.fedoseevmusic
+    - name: FIX Android Platform Files
+      run: |
+        # Remove broken android folder
+        rm -rf android
+        # Recreate with proper structure
+        flutter create . --platforms=android --org com.fedoseevmusic
         
     - name: Get Flutter dependencies
       run: flutter pub get
@@ -90,7 +98,7 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x android/gradlew
         
-    - name: Build APK (V2 embedding compatible)
+    - name: Build APK (FIXED)
       run: flutter build apk --release
       
     - name: Upload APK artifact
