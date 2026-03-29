@@ -6,7 +6,6 @@ import 'screens/home_screen.dart';
 import 'screens/now_playing_screen.dart';
 import 'screens/search_screen.dart';
 import 'services/audio_service.dart';
-import 'services/youtube_search_service.dart';
 import 'widgets/liquid_aura.dart';
 import 'widgets/morphing_play_button.dart';
 
@@ -23,9 +22,8 @@ void main() async {
     ),
   );
   
-  // Initialize services
+  // Initialize audio service
   await AudioService().initialize();
-  await YouTubeSearchService().initialize();
   
   runApp(
     const ProviderScope(
