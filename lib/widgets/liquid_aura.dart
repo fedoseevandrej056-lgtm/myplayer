@@ -1,7 +1,6 @@
-import 'dart:math';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:palette_generator/palette_generator.dart';
 
 class LiquidAura extends StatefulWidget {
   final String? imageUrl;
@@ -29,24 +28,18 @@ class _LiquidAuraState extends State<LiquidAura>
   late final List<Animation<double>> _animations;
   
   final List<LiquidBlob> _blobs = [];
-  final Random _random = Random();
+  final math.Random _random = math.Random();
 
   @override
   void initState() {
     super.initState();
     _initializeBlobs();
     _initializeAnimations();
-    if (widget.imageUrl != null) {
-      _extractColors();
-    }
   }
 
   @override
   void didUpdateWidget(LiquidAura oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.imageUrl != oldWidget.imageUrl && widget.imageUrl != null) {
-      _extractColors();
-    }
   }
 
   void _initializeBlobs() {
@@ -76,30 +69,6 @@ class _LiquidAuraState extends State<LiquidAura>
               curve: Curves.easeInOut,
             ))
         .toList();
-  }
-
-  Future<void> _extractColors() async {
-    try {
-      final paletteGenerator = await PaletteGenerator.fromImageProvider(
-        NetworkImage(widget.imageUrl!),
-        size: const Size(100, 100),
-      );
-      
-      final vibrantColors = [
-        paletteGenerator.dominantColor?.color ?? Colors.purple.shade900,
-        paletteGenerator.vibrantColor?.color ?? Colors.blue.shade900,
-        paletteGenerator.lightVibrantColor?.color ?? Colors.indigo.shade900,
-        paletteGenerator.darkVibrantColor?.color ?? Colors.black,
-      ];
-      
-      if (mounted) {
-        setState(() {
-          _auraColors = vibrantColors;
-        });
-      }
-    } catch (e) {
-      // Keep default colors if extraction fails
-    }
   }
 
   @override
@@ -207,8 +176,8 @@ class LiquidAuraPainter extends CustomPainter {
       blob.update(16.0); // Assume 60 FPS
     
       // Apply animation transformations
-      final animatedX = blob.x + sin(animatedValue * 2 * pi + i) * 0.1;
-      final animatedY = blob.y + cos(animatedValue * 2 * pi + i) * 0.1;
+      final animatedX = blob.x + math.sin(animatedValue * 2 * math.pi + i) * 0.1;
+      final animatedY = blob.y + math.cos(animatedValue * 2 * math.pi + i) * 0.1;
       final animatedRadius = blob.radius * (0.8 + animatedValue * 0.4);
       
       final center = Offset(
@@ -242,8 +211,13 @@ class LiquidAuraPainter extends CustomPainter {
         final blob1 = blobs[i];
         final blob2 = blobs[j];
         
-        final center1 = Offset(blob1.x * size.width, blob1.y * size.height);
-        final center2 = Offset(blob2.x * size.width, blob2.y * size.height);
+        final x1 = blob1.x + blob1.radius * math.sin(time * 0.01 + blob1.colorIndex);
+        final y1 = blob1.y + blob1.radius * math.cos(time * 0.01 + blob1.colorIndex);
+        final x2 = blob2.x + blob2.radius * math.sin(time * 0.01 + blob2.colorIndex);
+        final y2 = blob2.y + blob2.radius * math.cos(time * 0.01 + blob2.colorIndex);
+        
+        final center1 = Offset(x1 * size.width, y1 * size.height);
+        final center2 = Offset(x2 * size.width, y2 * size.height);
         final distance = (center1 - center2).distance;
         const maxDistance = 200.0;
         

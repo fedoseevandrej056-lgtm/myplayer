@@ -31,28 +31,19 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Audio & Media
+  # Core Audio
   just_audio: ^0.9.40
-  just_audio_background: ^0.0.1-beta.17
-  on_audio_query: ^2.9.0
   
   # State Management
   flutter_riverpod: ^2.5.1
   
-  # Global Search & Streaming
-  youtube_explode_dart: ^2.2.2
-  
-  # UI & Animations
-  flutter_hooks: ^0.20.5
-  palette_generator: ^0.3.0+3
+  # UI Components
+  cupertino_icons: ^1.0.8
+  cached_network_image: ^3.3.1
   
   # Device Features
   sensors_plus: ^4.0.2
   haptic_feedback: ^0.4.0
-  
-  # UI Components
-  cupertino_icons: ^1.0.8
-  cached_network_image: ^3.3.1
 
 dev_dependencies:
   flutter_test:

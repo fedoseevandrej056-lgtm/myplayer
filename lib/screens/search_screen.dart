@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:ui' as ui;
 import '../widgets/liquid_aura.dart';
-import '../services/youtube_search_service.dart';
 import '../services/audio_service.dart';
 import '../models/track.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+  const SearchScreen({super.key});
 
   @override
   ConsumerState<SearchScreen> createState() => _SearchScreenState();
@@ -20,7 +19,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    // Auto-focus search field
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _searchFocusNode.requestFocus();
     });
@@ -35,10 +33,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final searchQuery = ref.watch(searchQueryProvider);
-    final searchResults = ref.watch(searchResultsProvider);
-    final trendingSearches = ref.watch(trendingSearchesProvider);
-    
     return LiquidAura(
       child: SafeArea(
         child: Column(
@@ -51,9 +45,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             
             // Content
             Expanded(
-              child: searchQuery.isEmpty
-                  ? _buildTrendingSearches(context, trendingSearches)
-                  : _buildSearchResults(context, searchResults),
+              child: _buildSearchResults(context),
             ),
           ],
         ),
@@ -80,7 +72,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             focusNode: _searchFocusNode,
             style: Theme.of(context).textTheme.bodyLarge,
             decoration: InputDecoration(
-              hintText: 'Search for any song...',
+              hintText: 'Search for music...',
               hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Colors.white.withOpacity(0.5),
               ),
@@ -96,7 +88,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       ),
                       onPressed: () {
                         _searchController.clear();
-                        ref.read(searchQueryProvider.notifier).state = '';
+                        setState(() {});
                       },
                     )
                   : null,
@@ -107,13 +99,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
             ),
             onChanged: (value) {
-              ref.read(searchQueryProvider.notifier).state = value;
-            },
-            onSubmitted: (value) {
-              if (value.isNotEmpty) {
-                // Trigger search
-                ref.read(searchQueryProvider.notifier).state = value;
-              }
+              setState(() {});
             },
           ),
         ),
@@ -121,36 +107,36 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildTrendingSearches(
-    BuildContext context,
-    AsyncValue<List<String>> trendingAsync,
-  ) {
-    return trendingAsync.when(
-      data: (trending) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              'Trending Searches',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ...trending.map((search) => _buildTrendingItem(context, search)),
-        ],
-      ),
-      loading: () => const Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      ),
-      error: (error, stack) => Center(
-        child: Text(
-          'Error loading trending searches',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Colors.red,
+  Widget _buildSearchResults(BuildContext context) {
+    if (_searchController.text.isEmpty) {
+      return _buildTrendingSearches(context);
+    }
+    
+    return _buildMockSearchResults(context);
+  }
+
+  Widget _buildTrendingSearches(BuildContext context) {
+    final trending = [
+      'Recent searches',
+      'Popular music',
+      'Chill vibes',
+      'Workout playlist',
+      'Study music',
+    ];
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            'Trending Searches',
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
         ),
-      ),
+        const SizedBox(height: 16),
+        ...trending.map((search) => _buildTrendingItem(context, search)),
+      ],
     );
   }
 
@@ -160,7 +146,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       child: GestureDetector(
         onTap: () {
           _searchController.text = search;
-          ref.read(searchQueryProvider.notifier).state = search;
+          setState(() {});
         },
         child: Container(
           padding: const EdgeInsets.all(16),
@@ -198,57 +184,30 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildSearchResults(
-    BuildContext context,
-    AsyncValue<List<Track>> resultsAsync,
-  ) {
-    return resultsAsync.when(
-      data: (tracks) => tracks.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.search_off_rounded,
-                    color: Colors.white.withOpacity(0.5),
-                    size: 64,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No results found',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.white.withOpacity(0.7),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: tracks.length,
-              itemBuilder: (context, index) {
-                final track = tracks[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _buildSearchResultItem(context, track),
-                );
-              },
-            ),
-      loading: () => const Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      ),
-      error: (error, stack) => Center(
-        child: Text(
-          'Error searching: $error',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Colors.red,
-          ),
-        ),
-      ),
+  Widget _buildMockSearchResults(BuildContext context) {
+    final mockResults = [
+      {'title': 'Midnight Dreams', 'artist': 'Luna Echo', 'duration': '3:45'},
+      {'title': 'Electric Pulse', 'artist': 'Neon Waves', 'duration': '4:12'},
+      {'title': 'Crystal Waters', 'artist': 'Azure Sky', 'duration': '3:28'},
+    ];
+    
+    return ListView.builder(
+      padding: const EdgeInsets.all(20),
+      itemCount: mockResults.length,
+      itemBuilder: (context, index) {
+        final track = mockResults[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: _buildSearchResultItem(context, track),
+        );
+      },
     );
   }
 
-  Widget _buildSearchResultItem(BuildContext context, Track track) {
+  Widget _buildSearchResultItem(
+    BuildContext context,
+    Map<String, String> track,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -267,50 +226,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             height: 56,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: Colors.white.withOpacity(0.1),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.purple.shade400,
+                  Colors.blue.shade400,
+                ],
+              ),
             ),
-            child: track.artworkUrl != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      track.artworkUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.purple.shade400,
-                                Colors.blue.shade400,
-                              ],
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.music_note,
-                            color: Colors.white54,
-                          ),
-                        );
-                      },
-                    ),
-                  )
-                : Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.purple.shade400,
-                          Colors.blue.shade400,
-                        ],
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.music_note,
-                      color: Colors.white54,
-                    ),
-                  ),
           ),
           
           const SizedBox(width: 16),
@@ -321,7 +245,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  track.title,
+                  track['title']!,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
@@ -330,16 +254,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  track.artist,
+                  track['artist']!,
                   style: Theme.of(context).textTheme.bodyMedium,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                if (track.duration != null)
-                  Text(
-                    _formatDuration(track.duration!),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
+                Text(
+                  track['duration']!,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
               ],
             ),
           ),
@@ -347,9 +270,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           // Play button
           IconButton(
             onPressed: () {
-              // Handle track play
+              // Handle track play with mock data
+              final mockTrack = Track(
+                id: 'mock_${track['title']}',
+                title: track['title']!,
+                artist: track['artist']!,
+                album: 'Mock Album',
+                uri: null, // No actual file
+                artworkUrl: null,
+                youtubeId: null,
+                duration: null,
+              );
+              
               final audioService = ref.read(audioServiceProvider);
-              audioService.playTrack(track);
+              audioService.playTrack(mockTrack);
             },
             icon: Icon(
               Icons.play_circle_rounded,
@@ -360,11 +294,5 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ],
       ),
     );
-  }
-
-  String _formatDuration(Duration duration) {
-    final minutes = duration.inMinutes.remainder(60);
-    final seconds = duration.inSeconds.remainder(60);
-    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 }
